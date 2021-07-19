@@ -1,0 +1,549 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="text/css" http-equiv="Content-Style-Type">
+<title>线程</title>
+</head>
+<body>
+<h1 align="center" class="root">
+<a name="50eirjg50pjgtrtf0166nfmk1c">线程</a>
+</h1>
+<div align="center" class="globalOverview">
+<img src="%E7%BA%BF%E7%A8%8B_files/images/%E7%BA%BF%E7%A8%8B.jpg"></div>
+<h2 class="topic">
+<a name="00iakt49gv94dqsstoj1gmp65o">创建线程的方式</a>
+</h2>
+<h3 class="topic">
+<a name="3log1h7frpr46e54oqcs7j0fu6">&nbsp;继承Thread</a>
+</h3>
+<h3 class="topic">
+<a name="7bol4190qvr663s10n10sno72u">&nbsp;&nbsp;start方法-cpu调度原理</a>
+</h3>
+<p class="topicImage">
+<img height="309" src="%E7%BA%BF%E7%A8%8B_files/1b2k5a2khcu10kdp66kpcru7me.png" width="398"></p>
+<div class="notesContainer">
+<p>1、start是一个被syschronized修饰的方法，即同一个线程不可以被多次start。</p>
+<p>2、通过start启动线程真正意义实现了多线程，主线程后续操作不用等待该线程结束。</p>
+<p>3、start方法的执行流程如下：</p>
+<p></p>
+<p>3.1、new Thread().start</p>
+<p>3.2、start0(本地方法)</p>
+<p>3.3、由jvm创建平台线程(可执行的动态线程，不同的操作系统有不通的创建机制)</p>
+<p>3.4、新创建的线程状态为Initialized，调用了sync-&gt;wait()的方法进行等待，等到被唤醒才继续执行thread-&gt;run()，这里的唤醒在不同的操作系统有不同的调度机制。</p>
+<p>3.5、启动线程，即唤醒3.4的wait，往下执行run方法，接着回调java线程中的run方法。</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="6r4p63t2r77agpegc3bt2cqe84">&nbsp;&nbsp;run方法</a>
+</h3>
+<div class="notesContainer">
+<p>run方法就是普通的实例方法，在多线程中，用于执行具体的业务实现。</p>
+</div>
+<h3 class="topic">
+<a name="010osobctbn3k04adsii78jvkt">&nbsp;实现Runnable</a>
+</h3>
+<div class="notesContainer">
+<p>run方法执行的是具体业务，将任务交给某一个线程执行</p>
+</div>
+<h3 class="topic">
+<a name="7rri3u6dj8dlj6v2ja0bo1uvaj">&nbsp;实现Callable</a>
+</h3>
+<div class="notesContainer">
+<p>可以结合Future和FutureTask，拿到线程执行之后的计算结果，获取结果为阻塞状态。</p>
+</div>
+<h3 class="topic">
+<a name="54e389b4sn295brpf9kikbnv0f">&nbsp;通过线程池创建</a>
+</h3>
+<h2 class="topic">
+<a name="61i9igc2ujjcpo6s5il8ckl7aj">线程的生命周期、状态</a>
+</h2>
+<h3 class="topic">
+<a name="0i4k31hh0ar6dt4t5ardvd834b">&nbsp;线程的终止方式</a>
+</h3>
+<h3 class="topic">
+<a name="42af6h00tnqkm5spcm16ghbbr6">&nbsp;&nbsp;stop</a>
+</h3>
+<div class="notesContainer">
+<p>此方法已经被废弃，因为会暴力的终止线程， 可能被终止的线程业务执行了一半，调用stop之后，直接停止，导致业务数据处理出现问题。</p>
+</div>
+<h3 class="topic">
+<a name="4t9de1nr4o6j7jtq5o058da4rn">&nbsp;&nbsp;interrupt</a>
+</h3>
+<div class="notesContainer">
+<p>线程对象的实例方法，该方法不会终止线程，而只是修改线程的终止状态值，具体是否终止线程，由具体的业务根据Thread.interrupted()、thread.isInterrupted()判断状态之后，自行决定。</p>
+</div>
+<h3 class="topic">
+<a name="7326njo2qjnjic3m5n3us3s9nj">&nbsp;&nbsp;&nbsp;Thread.interrupted()</a>
+</h3>
+<div class="notesContainer">
+<p>判断出当前线程是否是中断（停止）状态，并且还会将中断状态重置</p>
+</div>
+<h3 class="topic">
+<a name="7k4c8nvqjqubd3t0hdvke8an9c">&nbsp;&nbsp;&nbsp;this.isInterrupted()</a>
+</h3>
+<div class="notesContainer">
+<p>判断出线程是否是中断（停止）状态，不会将中断状态重置</p>
+</div>
+<h3 class="topic">
+<a name="5912srem1c9kcva0jec3a5043m">&nbsp;&nbsp;&nbsp;使用场景</a>
+</h3>
+<div class="notesContainer">
+<p>1、某个线程执行阻塞时间过长</p>
+<p>2、多个线程处理同一个任务，有一个线程处理完成，其他线程即可中断</p>
+<p>。。。。。。</p>
+</div>
+<h3 class="topic">
+<a name="0j0ve7eonibmr7cjavscq4vh68">&nbsp;线程通信</a>
+</h3>
+<h3 class="topic">
+<a name="4suooo4uaagfcsihgfuufl6s5p">&nbsp;&nbsp;wait/notify，object的方法</a>
+</h3>
+<h3 class="topic">
+<a name="4q4tq7a61hdppm5lojkmfd959k">&nbsp;&nbsp;&nbsp;使用前提</a>
+</h3>
+<div class="notesContainer">
+<p>1、需要和synchronized一起使用，即必须获取到对象锁。wait方法在使用时，会强行让线程释放锁，所以在调用时线程必须已经获取到锁，否则会抛出异常。</p>
+<p></p>
+<p>2、不和synchronized配合使用会出现什么问题？伪代码和解析如下：</p>
+<p></p>
+<p>// 线程A 的代码</p>
+<p>while(!condition){ </p>
+<p>    wait();</p>
+<p>}</p>
+<p>// do something</p>
+<p></p>
+<p></p>
+<p>// 线程 B 的代码</p>
+<p>if(!condition){ </p>
+<p>	// do something ...</p>
+<p>    condition = true;</p>
+<p>    notify();</p>
+<p>}</p>
+<p></p>
+<p>a 线程A执行过了while判断，但还为执行到wait</p>
+<p></p>
+<p>b 线程B直接执行完了，notify操作没有任何效果</p>
+<p></p>
+<p>c 线程A执行到wait，这个时候会一直阻塞。</p>
+<p></p>
+<p>修改之后的伪代码：</p>
+<p>// 线程 A 的代码</p>
+<p>synchronized(obj_A)</p>
+<p>{</p>
+<p>	while(!condition){ </p>
+<p>	    obj_A.wait();</p>
+<p>	}</p>
+<p>	// do something </p>
+<p>}</p>
+<p></p>
+<p></p>
+<p>// 线程 B 的代码</p>
+<p>synchronized(obj_A)</p>
+<p>{</p>
+<p>	if(!condition){ </p>
+<p>		// do something ...</p>
+<p>	    condition = true;</p>
+<p>	    obj_A.notify();</p>
+<p>	}</p>
+<p>}</p>
+<p></p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="0ra72is6njoef6hi6edooeqcgc">&nbsp;&nbsp;&nbsp;实现原理</a>
+</h3>
+<div class="notesContainer">
+<p>1、调用wait之后会将线程，放入waiting-set队列，此时线程的状态是waiting，并且会将线程持有的monitor对象释放。</p>
+<p></p>
+<p>2、调用notify之后，并不会直接唤醒被wait的线程，而是将waiting-set队列中的任意一个线程移除到cxq或EntryList队列，使该线程重新开始获取锁资源。notify之后被wait的线程状态会回到就绪状态，等待cpu调度。</p>
+</div>
+<h3 class="topic">
+<a name="6kn7p0d7c5sbfmo4910rsd8hbc">&nbsp;&nbsp;sleep</a>
+</h3>
+<h3 class="topic">
+<a name="59uhfi4djnldd07o1ugs6rpvbq">&nbsp;&nbsp;wait和sleep的区别</a>
+</h3>
+<h3 class="topic">
+<a name="20uke4829dpjqsrde6nnfd2b74">&nbsp;&nbsp;yield，让出cpu时间片，重新竞争cpu的调度权</a>
+</h3>
+<h3 class="topic">
+<a name="1gvjl0nvkkj2b68vdf2go47qja">&nbsp;&nbsp;join</a>
+</h3>
+<h3 class="topic">
+<a name="44uc9ne2uepi6outpa3n3jcr4l">&nbsp;&nbsp;&nbsp;实现原理</a>
+</h3>
+<div class="notesContainer">
+<p>public final void join() throws InterruptedException {</p>
+<p>        join(0);</p>
+<p>    }</p>
+<p></p>
+<p>    public final synchronized void join(long millis)</p>
+<p>    throws InterruptedException {</p>
+<p>        long base = System.currentTimeMillis();</p>
+<p>        long now = 0;</p>
+<p></p>
+<p>        if (millis &lt; 0) {</p>
+<p>            throw new IllegalArgumentException("timeout value is negative");</p>
+<p>        }</p>
+<p></p>
+<p>        if (millis == 0) {</p>
+<p>            while (isAlive()) {</p>
+<p>                wait(0);</p>
+<p>            }</p>
+<p>        } else {</p>
+<p>            while (isAlive()) {</p>
+<p>                long delay = millis - now;</p>
+<p>                if (delay &lt;= 0) {</p>
+<p>                    break;</p>
+<p>                }</p>
+<p>                wait(delay);</p>
+<p>                now = System.currentTimeMillis() - base;</p>
+<p>            }</p>
+<p>        }</p>
+<p>    }</p>
+<p>1、在main线程中调用A线程的join，由于join是同步方法，所以main线程会持有A线程对象的锁。</p>
+<p>2、在join方法中调用wait方法，main线程会释放线程A对象的锁资源，进入wating状态。</p>
+<p>3、线程A执行结束之后，将唤醒threadA对象waiting-set中的线程，也就是main线程</p>
+</div>
+<h3 class="topic">
+<a name="3udkp1td6chocccg5qdqanfboe">&nbsp;&nbsp;volatile</a>
+</h3>
+<p class="labelsAndMarkers">
+<img class="marker" src="%E7%BA%BF%E7%A8%8B_files/images/star_red.png"></p>
+<h3 class="topic">
+<a name="71c4mtnnsn2m1r60s6b4f9suf2">&nbsp;&nbsp;&nbsp;计算机内存模型</a>
+</h3>
+<p class="topicImage">
+<img height="203" src="%E7%BA%BF%E7%A8%8B_files/1439l5c8o59ebhrsgvoels92dr.png" width="400"></p>
+<h3 class="topic">
+<a name="3eq92doiq6p97av4skc131b9p7">&nbsp;&nbsp;&nbsp;&nbsp;概念</a>
+</h3>
+<div class="notesContainer">
+<p>1、每条指令的执行，都是在cpu中执行的，在执行的过程中，会涉及到对数据的读取和写入，数据是在主存当中存储的(物理内存)，因为cpu的执行速度很快，对物理内存的操作，会影响到运行速度，因此cpu会将主存的数据读入cpu的高速缓存中，对数据操作完成之后，再将数值刷到主存中。</p>
+<p></p>
+</div>
+<h3 class="topic">
+<a name="7ufs3g0qdse262gqiculokhf6l">&nbsp;&nbsp;&nbsp;&nbsp;cpu高速缓存</a>
+</h3>
+<h3 class="topic">
+<a name="1sm67f4g3cmqvpjkgs15rh2p84">&nbsp;&nbsp;&nbsp;&nbsp;问题</a>
+</h3>
+<div class="notesContainer">
+<p>由以上概念可知，将数据读入高速缓存之后对数据进行操作，会出现最终刷到主存的数据，不是最终期望结果，因为各个cpu之间的高速缓存对于其他cpu来说是不可见的。</p>
+</div>
+<h3 class="topic">
+<a name="5grmqphivq6p11uvannhmstfv8">&nbsp;&nbsp;&nbsp;&nbsp;缓存一致性协议</a>
+</h3>
+<div class="notesContainer">
+<p>当CPU写数据时，如果发现操作的变量是共享变量，即在其他CPU中也存在该变量的副本，会发出信号通知其他CPU将该变量的缓存行置为无效状态，因此当其他CPU需要读取这个变量时，发现自己缓存中缓存该变量的缓存行是无效的，那么它就会从内存重新读取。</p>
+</div>
+<h3 class="topic">
+<a name="7ehu524jrdgskob9p5400kok81">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cpu缓存状态</a>
+</h3>
+<h3 class="topic">
+<a name="5fusifq8t835lg5iv0vl4arife">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;状态说明</a>
+</h3>
+<h3 class="topic">
+<a name="3dn1lhqsm8mkf1pfgun7rui0mc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;状态流转举例</a>
+</h3>
+<h3 class="topic">
+<a name="0srb2g7hkpv101pajp77rcq8q8">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;为什么有了缓存一致性协议，还需要volatile关键字？</a>
+</h3>
+<div class="notesContainer">
+<p>主要是解决多cpu对于数据的读写，由于store buffer和invalidate queue的存在，导致最新值未更新到缓存和主存中，因此需要内存屏障保证多cpu的读写。</p>
+</div>
+<h3 class="topic">
+<a name="32ulejs7i4kbd6ibf6sb453o9t">&nbsp;&nbsp;&nbsp;java内存模型-重点理解</a>
+</h3>
+<h3 class="topic">
+<a name="3v41t6d28fna5nr9ht7vkrv4km">&nbsp;&nbsp;&nbsp;&nbsp;概念</a>
+</h3>
+<div class="notesContainer">
+<p>1、jmm本身是一种抽象的概念，并不是真实存在的，它定义了主内存和工作内存的概念，主内存主要存储的是线程共享的内容，可以理解为jvm的堆、方法区，工作内存为线程工作时的存储部分。</p>
+<p></p>
+<p>2、线程在运行时会将主内存的数据拷贝到自己的工作内存，如果是基本数据类型是值本身，如果是引用类型拷贝的是引用的地址值，在运行过程中在自己的工作内存中对数据进行操作，然后刷新到主内存中，并且不同线程的工作内存是独立的。</p>
+<p></p>
+<p>3、由以上可得出多线程操作同一份共享变量，会引起线程安全问题如：</p>
+<p>public class ThreadTest {</p>
+<p>    private static boolean isDone;</p>
+<p>    public static void main(String[] args) {</p>
+<p></p>
+<p>            new Thread(() -&gt; {</p>
+<p>                try {</p>
+<p>                    Thread.sleep(3000);</p>
+<p>                    isDone = true;</p>
+<p>                    System.out.println("Thread A is done!");</p>
+<p>                } catch (InterruptedException e) {</p>
+<p>                    e.printStackTrace();</p>
+<p>                }</p>
+<p>            }, "A").start();</p>
+<p>            new Thread(() -&gt; {</p>
+<p>                while (!isDone) {</p>
+<p>                    //System.out.println("Thread B is run");</p>
+<p>                }</p>
+<p>                System.out.println("Thread B is done!");</p>
+<p>            }, "B").start();</p>
+<p>        }</p>
+<p>}</p>
+<p>线程b会出现死循环的情况。</p>
+</div>
+<h3 class="topic">
+<a name="2ttc22i7a7a2up7f4hba9sb8e2">&nbsp;&nbsp;&nbsp;&nbsp;原子性</a>
+</h3>
+<div class="notesContainer">
+<p>1、单线程的执行，都是原子性的。</p>
+<p>2、多线程环境中，当一个操作不可被打断，则称这个操作是原子性的如 int i = 10。</p>
+<p>3、非原子性操作如i++</p>
+<p>分为三步：读取i的值，对i进行+1操作，将计算结果重新赋值给i，这三步是可以被其他线程打断的。</p>
+</div>
+<h3 class="topic">
+<a name="3b8uvek1rpp5nr4ks68fvm6ffa">&nbsp;&nbsp;&nbsp;&nbsp;可见性</a>
+</h3>
+<div class="notesContainer">
+<p>可见性是指当多个线程访问同一个变量时，一个线程修改了这个变量的值，其他线程能够立即看得到修改的值。</p>
+</div>
+<h3 class="topic">
+<a name="7583tr5h3lec1p44dkrdnebi3c">&nbsp;&nbsp;&nbsp;&nbsp;有序性</a>
+</h3>
+<div class="notesContainer">
+<p>1、程序执行的顺序按照代码的顺序执行。</p>
+<p></p>
+<p>2、指令重排代码：</p>
+<p>//线程1:</p>
+<p>context = loadContext();   //语句1</p>
+<p>inited = true;             //语句2</p>
+<p> 
+</p>
+<p>//线程2:</p>
+<p>while(!inited ){</p>
+<p>  sleep()</p>
+<p>}</p>
+<p>doSomethingwithconfig(context);</p>
+<p></p>
+<p>由于语句1和语句2之间没依赖关系，很可能会先执行语句2，在执行语句1，那此时线程2就有可能在未初始化完成的情况下，执行其他操作。</p>
+</div>
+<h3 class="topic">
+<a name="1vc3ri8q8llanvk6k4nc1nlo3l">&nbsp;&nbsp;&nbsp;&nbsp;happens-before原则</a>
+</h3>
+<h3 class="topic">
+<a name="4g6ap15t33t893tavc18musv04">&nbsp;&nbsp;&nbsp;volatile作用</a>
+</h3>
+<h3 class="topic">
+<a name="18pmb19srvo74vkd4tji5baqk3">&nbsp;&nbsp;&nbsp;&nbsp;防止重排序</a>
+</h3>
+<h3 class="topic">
+<a name="7l91ak900kgu2leusctkbga145">&nbsp;&nbsp;&nbsp;&nbsp;保证可见性</a>
+</h3>
+<h3 class="topic">
+<a name="5kh1f58m4ne0ki6tn0ge4erfnp">&nbsp;&nbsp;&nbsp;volatile和原子性的理解-重点理解</a>
+</h3>
+<p class="labelsAndMarkers">
+<img class="marker" src="%E7%BA%BF%E7%A8%8B_files/images/star_red.png"> <img class="marker" src="%E7%BA%BF%E7%A8%8B_files/images/priority_1.png"></p>
+<div class="notesContainer">
+<p>1、针对于被volatile修饰的i++操作，如果初始值是0，某一时刻t1线程将i读入工作内存，这个时候t1假设被其他事情阻塞，t2线程从主存中读取i，这个时候i还是0，因为t1并未对i进行+1操作，t2线程+1之后，将1刷入缓存和主存，此时t1继续执行，如果此时t1已经将i为0的初始值读入寄存器，那计算之后得到1，然后将得到的1刷入缓存和主存，这个时候的计算结果是不对的，因此volatile并不能保证原子性。</p>
+<p></p>
+<p>2、如果t1线程</p>
+</div>
+<h3 class="topic">
+<a name="030mofh1jkq55jqhj9nird5ta1">&nbsp;&nbsp;&nbsp;实现原理</a>
+</h3>
+<h3 class="topic">
+<a name="13fp9m27gedq58s26702cgi5qa">&nbsp;&nbsp;threadlocal-当前线程</a>
+</h3>
+<h3 class="topic">
+<a name="4036o8ftksoncl9b6rmo81com5">&nbsp;&nbsp;&nbsp;InheritableThreadLocal-父子线程传值</a>
+</h3>
+<h3 class="topic">
+<a name="7t3ga11sfi9t0v4u09aauiknrq">&nbsp;&nbsp;&nbsp;TransmittableThreadLocal-线程池传值</a>
+</h3>
+<h2 class="topic">
+<a name="6f994idrhiv7oa6eda9lgtqpko">线程安全-从以下三方面进行考虑</a>
+</h2>
+<h3 class="topic">
+<a name="2djgasmoo4675g6cufjoe3so22">&nbsp;原子性</a>
+</h3>
+<h3 class="topic">
+<a name="0kmq6opdemnh9jgt8df8ofrrna">&nbsp;可见性</a>
+</h3>
+<h3 class="topic">
+<a name="62h5gkg845o4g7oepha9ht0lpv">&nbsp;有序性</a>
+</h3>
+<h2 class="topic">
+<a name="3aclscr213el5jmbtce1m12tvp">线程同步</a>
+</h2>
+<h3 class="topic">
+<a name="4mfkc2tkj866um144qbg43a4p1">&nbsp;syschronizd</a>
+</h3>
+<h3 class="topic">
+<a name="6gaajcq4vdiau8j5rvldtsr760">&nbsp;&nbsp;特性</a>
+</h3>
+<h3 class="topic">
+<a name="2jff893l2vf3tv7cfohf9gjglg">&nbsp;&nbsp;&nbsp;原子性，确保代码只能被一个线程访问，并且不会被其他线程打扰中断</a>
+</h3>
+<h3 class="topic">
+<a name="21eucthmv7cea307rlqs84jk74">&nbsp;&nbsp;&nbsp;可见性&#13;
+1、线程加锁时，必须将工作内存的共享变量清空，从主存重新获取。&#13;
+2、线程解锁时，必须将工作内存的共享变量最新值，刷到主存，保证共享变量的可见性</a>
+</h3>
+<h3 class="topic">
+<a name="1gigk7omqh4v1hhgkqvda7t279">&nbsp;&nbsp;&nbsp;有序性&#13;
+1、保证程序串行化执行，和volatile的禁止指令重排序是不一样的</a>
+</h3>
+<h3 class="topic">
+<a name="1hqpg6mcpeh94a49tu33nli446">&nbsp;&nbsp;&nbsp;可重入性</a>
+</h3>
+<h3 class="topic">
+<a name="53qrjckuplrtkk463rk0p3rlc3">&nbsp;&nbsp;实现原理</a>
+</h3>
+<h3 class="topic">
+<a name="0fifcf8qrcla0o5v42danv0qi1">&nbsp;&nbsp;&nbsp;同步方法</a>
+</h3>
+<h3 class="topic">
+<a name="40e673o6lq3r2v0qom1k6gflf8">&nbsp;&nbsp;&nbsp;同步代码块</a>
+</h3>
+<h3 class="topic">
+<a name="19fr58t2ao5fct87eu1ltder64">&nbsp;&nbsp;锁状态</a>
+</h3>
+<h3 class="topic">
+<a name="5htfmhcnqd94voa6m77o8gqlqb">&nbsp;&nbsp;&nbsp;无锁</a>
+</h3>
+<h3 class="topic">
+<a name="2ohvlgk0rqccbs3bea0bl39n1j">&nbsp;&nbsp;&nbsp;偏向锁</a>
+</h3>
+<h3 class="topic">
+<a name="6o2gk4ufj112jfsps0a7vfm71v">&nbsp;&nbsp;&nbsp;轻量级锁</a>
+</h3>
+<h3 class="topic">
+<a name="02em9l6kn74c4ru7a754chkg5s">&nbsp;&nbsp;&nbsp;重量级锁</a>
+</h3>
+<h3 class="topic">
+<a name="5qnp2v15l0rqh70an734vdvabq">&nbsp;&nbsp;&nbsp;&nbsp;monitor对象</a>
+</h3>
+<p class="topicImage">
+<img height="213" src="%E7%BA%BF%E7%A8%8B_files/4h118ba5v93vapbs1rc7ufrh4n.png" width="589"></p>
+<h3 class="topic">
+<a name="7sktqi1lp2ntdlrq82sb5mstqj">&nbsp;&nbsp;锁升级大致流程</a>
+</h3>
+<h3 class="topic">
+<a name="07f66hpq7cnsrbjas6ur0oko7s">&nbsp;&nbsp;&nbsp;1、如果当前只有一个线程在执行任务，则将mark word中的thread id由0改为当前线程id，并将偏向锁标为改为01，这一步是通过CAS进行操作的，如果更新成功则代表线程已经获取偏向锁。&#13;
+2、当该线程再次获取偏向锁时，发现被偏向的线程是自己，继续执行代码块即可。&#13;
+3、当有其他线程获取锁时，发现偏向锁获得者不是自己，则进入偏向锁撤销过程中，将锁由偏向锁升级为轻量级锁。&#13;
+4、轻量级锁在线程栈中创建一个lock record记录锁对象的引用地址，并通过CAS将lock record的地址存储在mark word中。&#13;
+5、再通过CAS修改mark word中存储的lock record地址时发现是无锁状态，则获取轻量级锁成功。&#13;
+6、若上一步执行失败，判断获取轻量级锁的线程是否是当前线程，如果是则进行一次锁冲入，否则升级为重量级锁。</a>
+</h3>
+<h3 class="topic">
+<a name="0bsln1i88vgm8abquoglqmj4fr">&nbsp;&nbsp;java对象内存分布</a>
+</h3>
+<h3 class="topic">
+<a name="1b6hkk8qhoa9cbtc38e4fmfeku">&nbsp;&nbsp;&nbsp;对象头</a>
+</h3>
+<h3 class="topic">
+<a name="74e2j8pm8p2bhuue0nm0qciq3a">&nbsp;&nbsp;&nbsp;&nbsp;类型指针</a>
+</h3>
+<h3 class="topic">
+<a name="0697bm8jecl5n2m311nbg1ogj6">&nbsp;&nbsp;&nbsp;&nbsp;mark word</a>
+</h3>
+<h3 class="topic">
+<a name="06emf4m7d19hsb43ee7celegha">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;对象的hashCode</a>
+</h3>
+<h3 class="topic">
+<a name="3rcrof4n56jaucscnqfosnmhrf">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gc分代年龄</a>
+</h3>
+<h3 class="topic">
+<a name="4s3efqrlu33df06ofmr37ik08o">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;锁状态</a>
+</h3>
+<h3 class="topic">
+<a name="02c6mhr3ejf22783u0she3bk3l">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;。。。。</a>
+</h3>
+<h3 class="topic">
+<a name="6c82krjgafqk787rr0e2m8jrh4">&nbsp;&nbsp;&nbsp;实例数据</a>
+</h3>
+<h3 class="topic">
+<a name="7ree3m3j8nndc0gj917hngkd7m">&nbsp;&nbsp;&nbsp;对齐填充</a>
+</h3>
+<h3 class="topic">
+<a name="2ce5bore7n8lb4b580lblpur48">&nbsp;AQS</a>
+</h3>
+<h3 class="topic">
+<a name="3hpa40t4sf3kohmv34g5imgc0e">&nbsp;&nbsp;实现原理</a>
+</h3>
+<h3 class="topic">
+<a name="0432bm9glr1e1prtni4hpaa6q4">&nbsp;&nbsp;常用工具</a>
+</h3>
+<h3 class="topic">
+<a name="1bph2aqkl2udivim6vhel9g7mb">&nbsp;&nbsp;&nbsp;ReentrantLock</a>
+</h3>
+<h3 class="topic">
+<a name="60rmstl3mipqkr5evsv3693te5">&nbsp;&nbsp;&nbsp;&nbsp;公平锁</a>
+</h3>
+<h3 class="topic">
+<a name="5htna0ji86hbma2c8ha9u4hp55">&nbsp;&nbsp;&nbsp;&nbsp;非公平锁</a>
+</h3>
+<h3 class="topic">
+<a name="0unf4o94mojbjnc3iuvce4m4af">&nbsp;&nbsp;&nbsp;&nbsp;Condition</a>
+</h3>
+<h3 class="topic">
+<a name="2blnlq13l6ljbki9h9o5o8rnri">&nbsp;&nbsp;&nbsp;CountDownLatch</a>
+</h3>
+<h3 class="topic">
+<a name="67b7tdhj4kbid4ortv2eruri14">&nbsp;&nbsp;&nbsp;CyclicBarrier</a>
+</h3>
+<h3 class="topic">
+<a name="2g4d5tp7v6d67a5e6j2ap4tal6">&nbsp;&nbsp;&nbsp;Semaphore</a>
+</h3>
+<h3 class="topic">
+<a name="7lji90cvrck5nnaga34qkkb8ir">&nbsp;死锁</a>
+</h3>
+<h3 class="topic">
+<a name="5hfnbibcvccg1tue8pdund6375">&nbsp;&nbsp;定义</a>
+</h3>
+<h3 class="topic">
+<a name="7kkvsr2stth68dkcgef7i7cota">&nbsp;&nbsp;排查、解决</a>
+</h3>
+<h3 class="topic">
+<a name="4gdukd05dr08pg10qtlk154e5l">&nbsp;&nbsp;预防</a>
+</h3>
+<h3 class="topic">
+<a name="4mej8hapmv6vg6oaq8kijpbfpr">&nbsp;锁类型</a>
+</h3>
+<h3 class="topic">
+<a name="5n5a5n5197oln5it8o4rphv6if">&nbsp;&nbsp;乐观锁、悲观锁</a>
+</h3>
+<h3 class="topic">
+<a name="550c9ps9hmli99oqqiqemjch5l">&nbsp;&nbsp;公平、非公平</a>
+</h3>
+<h3 class="topic">
+<a name="199goim7ol6meg5pm0ohk3i2hd">&nbsp;&nbsp;可重入、不可重入</a>
+</h3>
+<h3 class="topic">
+<a name="6f0avfbcublrb0162t1vpg656f">&nbsp;&nbsp;共享、独享</a>
+</h3>
+<h3 class="topic">
+<a name="3ihi83pakvg6d6rfic7mprl1u5">&nbsp;cas</a>
+</h3>
+<h3 class="topic">
+<a name="0pmmgql1hrqafes1alp6fprgq7">&nbsp;&nbsp;优点</a>
+</h3>
+<h3 class="topic">
+<a name="3j80vu1n21vi0tjo20mnnpaefa">&nbsp;&nbsp;&nbsp;1、可以保证变量操作的原子性；&#13;
+2、并发量不是很高的情况下，使用CAS机制比使用锁机制效率更高；&#13;
+3、在线程对共享资源占用时间较短的情况下，使用CAS机制效率也会较高</a>
+</h3>
+<h3 class="topic">
+<a name="5pvh7ve0a5foven9604dklpufi">&nbsp;&nbsp;缺点</a>
+</h3>
+<h3 class="topic">
+<a name="528avrmuc07m0ff21f1g2q8skv">&nbsp;&nbsp;&nbsp;1、循环比较吃cpu&#13;
+2、ABA问题&#13;
+3、只能保证一个共享变量的原子操作</a>
+</h3>
+<h2 class="topic">
+<a name="2st0lbugbiq1lbf1aqspne95kv">线程池</a>
+</h2>
+<h2 class="topic">
+<a name="30egtuo9reejpbn1jm65pvch6i">常见面试code</a>
+</h2>
+</body>
+</html>
